@@ -1,7 +1,8 @@
 import Loading from './Loading'
+import Dialog from './Dialog'
 import Player, { Direction } from './Player_1'
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property } = cc._decorator
 
 @ccclass
 export default class Game extends cc.Component {
@@ -9,14 +10,18 @@ export default class Game extends cc.Component {
     loading: cc.Node = null
     @property(cc.Node)
     player: cc.Node = null
+    @property(cc.Node)
+    dialog: cc.Node = null
 
     now_map: string = ''
 
     Loading: Loading
+    Dialog: Dialog
     Player: Player
 
     async onLoad() {
         this.Loading = this.loading.getComponent('Loading')
+        this.Dialog = this.dialog.getComponent('Dialog')
         this.Player = this.player.getComponent('Player_1')
 
         const p = cc.director.getPhysicsManager()
@@ -46,6 +51,29 @@ export default class Game extends cc.Component {
                 this.setMap('map/map', () => {
                     this.setPlayer(300, 300, 1)
                 })
+            } else if (e.keyCode === 51) {
+                this.Dialog.init([
+                    {
+                        id: 1,
+                        text: '<color=red>这是测试这是测试这是测试这是测试这是测试</color>23424234234 '
+                    },
+                    {
+                        id: 2,
+                        text: '这也是测试这也<color=yellow>是测试这也是测试这</color>也是测试这也是测试这也是测试这也是测试这也是测试这也是测试这也是测试'
+                    },
+                    {
+                        id: 2,
+                        text: '123123123123123144124124124124121414'
+                    },
+                    {
+                        id: 1,
+                        text: 'asdajkdasjdnajslndajsdjasnkjfaskdansjd'
+                    },
+                    {
+                        id: 2,
+                        text: '4123n5j23n5j23n5325n2ij3n5j235test这是测试这是测试这是测试这是测试这是测试'
+                    }
+                ])
             }
         })
     }
