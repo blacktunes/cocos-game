@@ -1,3 +1,5 @@
+import Game from "./Game_1";
+
 const { ccclass, property } = cc._decorator;
 
 export enum Direction {
@@ -91,9 +93,10 @@ export default class Player extends cc.Component {
     onLoad() {
         this.sprite = this.node.getComponent(cc.Sprite)
         this.animation = this.node.getComponent(cc.Animation)
+        this.node.zIndex = 2
 
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, (e: cc.Event.EventKeyboard) => {
-            if (window['stopAll']) return
+            if (window['stopAll'] || (window['dialog'] && window['dialog'].active)) return
             switch (e.keyCode) {
                 case cc.macro.KEY.up:
                     this.moveStart(Direction.UP)
@@ -155,9 +158,14 @@ export default class Player extends cc.Component {
     }
 
     onCollisionEnter(other, slef) {
-        const game = cc.find('Canvas/main').getComponent('Game_1')
-        game.setMap(other.data.to, () => {
-            game.setPlayer(other.data.x, other.data.y, this.direction)
-        })
+        const game: Game = cc.find('Canvas/main').getComponent('Game_1')
+        if (!other.event) return
+        if (other.event.type === 'talk') {
+            game.Dialog.init(other.event.msg)
+        } else if (other.event.type === 'tp') {
+            game.setMap(other.event.to, () => {
+                game.setPlayer(other.event.x, other.event.y, other.event.d)
+            })
+        }
     }
 }
