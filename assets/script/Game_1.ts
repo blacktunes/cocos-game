@@ -1,70 +1,7 @@
 import Loading from './Loading'
 import Dialog from './Dialog'
 import Player, { Direction } from './Player_1'
-
-const mapList = {
-    'map/map2': {
-        'test': {
-            x: 3,
-            y: 3,
-            stop: false,
-            sprite: 'test/cat',
-            event: {
-                type: 'tp',
-                to: 'map/map',
-                x: 30,
-                y: 40,
-                d: 1
-            }
-        }
-    },
-    'map/map': {
-        'test': {
-            x: 10,
-            y: 38,
-            stop: true,
-            sprite: 'test/test',
-            event: {
-                type: 'talk',
-                msg: [
-                    {
-                        id: 1,
-                        text: '<color=red>这是测试这是测试这是测试这是测试这是测试</color>23424234234 '
-                    },
-                    {
-                        id: 2,
-                        text: '这也是测试这也<color=yellow>是测试这也是测试这</color>也是测试这也是测试这也是测试这也是测试这也是测试这也是测试这也是测试'
-                    },
-                    {
-                        id: 2,
-                        text: '123123123123123144124124124124121414'
-                    },
-                    {
-                        id: 1,
-                        text: 'asdajkdasjdnajslndajsdjasnkjfaskdansjd'
-                    },
-                    {
-                        id: 2,
-                        text: '4123n5j23n5j23n5325n2ij3n5j235test这是测试这是测试这是测试这是测试这是测试'
-                    }
-                ]
-            }
-        },
-        'test2': {
-            x: 13,
-            y: 6,
-            stop: false,
-            sprite: 'test/cat',
-            event: {
-                type: 'tp',
-                to: 'map/map2',
-                x: 3,
-                y: 6,
-                d: 3
-            }
-        }
-    }
-}
+import GameEvent from './Event'
 
 const { ccclass, property } = cc._decorator
 
@@ -82,11 +19,13 @@ export default class Game extends cc.Component {
     Loading: Loading
     Dialog: Dialog
     Player: Player
+    Event: GameEvent
 
     async onLoad() {
         this.Loading = this.loading.getComponent('Loading')
         this.Dialog = this.dialog.getComponent('Dialog')
         this.Player = this.player.getComponent('Player_1')
+        this.Event = this.getComponent('Event')
 
         const p = cc.director.getPhysicsManager()
         p.enabled = true
@@ -155,15 +94,15 @@ export default class Game extends cc.Component {
 
             const eventNode = cc.find('Canvas/main/event')
             eventNode.removeAllChildren()
-            if (mapList[path]) {
-                for (const i in mapList[path]) {
-                    cc.resources.load(mapList[path][i].sprite, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
-                        const node = new cc.Node(mapList[path][i].name)
+            if (this.Event.list[path]) {
+                for (const i in this.Event.list[path]) {
+                    cc.resources.load(this.Event.list[path][i].sprite, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
+                        const node = new cc.Node(this.Event.list[path][i].name)
                         node.group = 'item'
-                        node.setPosition(mapList[path][i].x * 32, -mapList[path][i].y * 32)
+                        node.setPosition(this.Event.list[path][i].x * 32, -this.Event.list[path][i].y * 32)
                         node.width = node.height = 32
                         node.setAnchorPoint(0, 0)
-                        if (mapList[path][i].stop) {
+                        if (this.Event.list[path][i].stop) {
                             const body = node.addComponent(cc.RigidBody)
                             body.type = cc.RigidBodyType.Static
                             const collider = node.addComponent(cc.PhysicsBoxCollider)
@@ -174,7 +113,7 @@ export default class Game extends cc.Component {
                         const box = node.addComponent(cc.BoxCollider)
                         box.size = cc.size(32, 32)
                         box.offset = cc.v2(16, 16)
-                        box['event'] = mapList[path][i].event
+                        box['event'] = this.Event.list[path][i].event
                         const Sprite = node.addComponent(cc.Sprite)
                         Sprite.spriteFrame = sprite
                         eventNode.addChild(node)

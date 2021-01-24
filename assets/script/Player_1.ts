@@ -94,6 +94,7 @@ export default class Player extends cc.Component {
         this.sprite = this.node.getComponent(cc.Sprite)
         this.animation = this.node.getComponent(cc.Animation)
         this.node.zIndex = 2
+        cc.systemEvent.on('keydown', this.eventLister, this)
 
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, (e: cc.Event.EventKeyboard) => {
             if (window['stopAll'] || (window['dialog'] && window['dialog'].active)) return
@@ -134,6 +135,10 @@ export default class Player extends cc.Component {
         })
     }
 
+    onDestroy() {
+        cc.systemEvent.off('keydown', this.eventLister)
+    }
+
     update(dt) {
         if (this.isMoving) {
             if (this.direction === Direction.UP) {
@@ -157,15 +162,26 @@ export default class Player extends cc.Component {
         }
     }
 
-    onCollisionEnter(other, slef) {
-        const game: Game = cc.find('Canvas/main').getComponent('Game_1')
-        if (!other.event) return
-        if (other.event.type === 'talk') {
-            game.Dialog.init(other.event.msg)
-        } else if (other.event.type === 'tp') {
-            game.setMap(other.event.to, () => {
-                game.setPlayer(other.event.x, other.event.y, other.event.d)
-            })
+    event_now = null
+
+    eventLister(e: cc.Event.EventKeyboard) {
+        if (!this.event_now || window['stopAll'] || (window['dialog'] && window['dialog'].active)) return
+        if (e.keyCode === cc.macro.KEY.z || e.keyCode === cc.macro.KEY.space) {
+            this.event_now()
         }
+    }
+
+    onCollisionEnter(other, slef) {
+        if (!other.event) return
+        if (other.event.auto) {
+            this.event_now = null
+            other.event.fn()
+        } else {
+            this.event_now = other.event.fn
+        }
+    }
+
+    onCollisionExit(other, slef) {
+        this.event_now = null
     }
 }
