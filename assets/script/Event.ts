@@ -1,16 +1,34 @@
-import Game from './Game_1'
+import Game from './Game'
+import { Direction } from './Player'
 
 const { ccclass, property } = cc._decorator
+
+interface MapEventList {
+    [MapName: string]: MapEvent
+}
+
+interface MapEvent {
+    [EventName: string]: {
+        x: number
+        y: number
+        stop: boolean
+        sprite: string
+        event: {
+            auto: boolean
+            fn: () => void
+        }
+    }
+}
 
 @ccclass
 export default class GameEvent extends cc.Component {
     Game: Game
 
     onLoad() {
-        this.Game = this.getComponent('Game_1')
+        this.Game = this.getComponent('Game')
     }
 
-    list = {
+    list: MapEventList = {
         'map/map2': {
             'test': {
                 x: 3,
@@ -21,7 +39,7 @@ export default class GameEvent extends cc.Component {
                     auto: true,
                     fn: () => {
                         this.Game.setMap('map/map', () => {
-                            this.Game.setPlayer(40, 40, 1)
+                            this.Game.setPlayer(40, 40, Direction.DOWN)
                         })
                     }
                 }
@@ -36,7 +54,7 @@ export default class GameEvent extends cc.Component {
                 event: {
                     auto: false,
                     fn: () => {
-                        this.Game.Dialog.init([
+                        this.Game.setTalk([
                             {
                                 id: 1,
                                 text: '<color=red>这是测试这是测试这是测试这是测试这是测试</color>23424234234 '
@@ -70,7 +88,7 @@ export default class GameEvent extends cc.Component {
                     auto: true,
                     fn: () => {
                         this.Game.setMap('map/map2', () => {
-                            this.Game.setPlayer(3, 6, 3)
+                            this.Game.setPlayer(3, 6, Direction.LEFT)
                         })
                     }
                 }

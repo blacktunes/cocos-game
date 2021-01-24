@@ -1,19 +1,10 @@
+import { avatar } from './data'
+
 const { ccclass, property } = cc._decorator
 
-interface TextData<T> {
+export interface TextData<T> {
     id: number
     text: T
-}
-
-const idMap = {
-    1: {
-        name: '洛亚希',
-        url: 'avatar/Nature_5'
-    },
-    2: {
-        name: '不知道是谁',
-        url: 'avatar/Actor1_6'
-    }
 }
 
 @ccclass
@@ -25,12 +16,12 @@ export default class Dialog extends cc.Component {
     @property(cc.RichText)
     textLabel: cc.RichText = null
 
-    textArr: TextData<string[]>[] = []
-    textInde = -1
-    nowText = []
-    textEnd = true
-    tt = 0
-    index = -1
+    private textArr: TextData<string[]>[] = []
+    private textInde = -1
+    private nowText = []
+    private textEnd = true
+    private tt = 0
+    private index = -1
 
     reset() {
         this.textArr = []
@@ -39,7 +30,7 @@ export default class Dialog extends cc.Component {
         this.thisLineEnd()
     }
 
-    thisLineEnd() {
+    private thisLineEnd() {
         this.textEnd = true
         this.nowText = []
         this.index = -1
@@ -51,7 +42,7 @@ export default class Dialog extends cc.Component {
         textArr.forEach(item => {
             tempArr.push({
                 id: item.id,
-                textList: this.splitText(item.text)
+                text: this.splitText(item.text)
             })
         })
         this.textArr = tempArr
@@ -59,7 +50,7 @@ export default class Dialog extends cc.Component {
         this.nextText()
     }
 
-    splitText(str: string) {
+    private splitText(str: string) {
         const regex = /<.+?\/?>/g // 匹配尖括号标签
         const matchArr = str.match(regex);
         const specialChar = '│'
@@ -94,7 +85,7 @@ export default class Dialog extends cc.Component {
             }
         }
         const lastStrArr = [] // 转换后富文本数组
-        const arrayParm = new Array(paraNum).fill("") // 替换参数数组
+        const arrayParm = new Array(paraNum).fill('') // 替换参数数组
         for (let i = 0; i < textArr.length; i++) {
             for (const text of textArr[i]) {
                 arrayParm[i] = arrayParm[i] + text
@@ -108,7 +99,7 @@ export default class Dialog extends cc.Component {
         return lastStrArr
     }
 
-    nextText() {
+    private nextText() {
         if (!this.textEnd) {
             this.setText(this.textArr[this.textInde])
         } else if (++this.textInde < this.textArr.length) {
@@ -119,24 +110,24 @@ export default class Dialog extends cc.Component {
         }
     }
 
-    setText(textData) {
+    private setText(textData: TextData<string[]>) {
         if (!this.textEnd) {
-            this.textLabel.string = textData.textList[textData.textList.length - 1]
+            this.textLabel.string = textData.text[textData.text.length - 1]
             this.thisLineEnd()
         } else {
             this.textLabel.string = ''
-            this.nowText = textData.textList
+            this.nowText = textData.text
             this.textEnd = false
         }
 
-        this.nameLabel.string = idMap[textData.id].name
+        this.nameLabel.string = avatar[textData.id].name
 
-        cc.resources.load(idMap[textData.id].url, cc.SpriteFrame, (err, sprite) => {
-            this.avatar.spriteFrame = sprite as any
+        cc.resources.load(avatar[textData.id].path, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
+            this.avatar.spriteFrame = sprite
         })
     }
 
-    onKeyDown(e: cc.Event.EventKeyboard) {
+    private onKeyDown(e: cc.Event.EventKeyboard) {
         if (e.keyCode === cc.macro.KEY.z || e.keyCode === cc.macro.KEY.space) {
             this.nextText()
         }

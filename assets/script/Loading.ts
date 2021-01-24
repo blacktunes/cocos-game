@@ -1,10 +1,15 @@
-const { ccclass, property } = cc._decorator;
+const { ccclass, property } = cc._decorator
 
 @ccclass
 export default class Loading extends cc.Component {
     @property(cc.Label)
     label: cc.Label = null
 
+    /**
+     * 显示加载页面
+     * @param fade 淡入时长
+     * @param text 加载提示文字
+     */
     show(fade = 0.5, text = 'LOADING') {
         if (this.node.active) return
         this.node.opacity = 0
@@ -26,6 +31,10 @@ export default class Loading extends cc.Component {
         })
     }
 
+    /**
+     * 隐藏加载页面
+     * @param fade 淡出时长
+     */
     hide(fade = 0.5) {
         if (!this.node.active) return
         this.node.opacity = 255

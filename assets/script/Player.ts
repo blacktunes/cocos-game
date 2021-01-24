@@ -1,6 +1,4 @@
-import Game from "./Game_1";
-
-const { ccclass, property } = cc._decorator;
+const { ccclass, property } = cc._decorator
 
 export enum Direction {
     'UP',
@@ -31,7 +29,7 @@ export default class Player extends cc.Component {
 
     @property
     direction: Direction = Direction.DOWN
-    isMoving = false
+    private isMoving = false
 
     setDirection(direction: Direction) {
         if (this.direction === direction) return
@@ -40,7 +38,7 @@ export default class Player extends cc.Component {
         this.setSprite()
     }
 
-    setSprite() {
+    private setSprite() {
         if (this.direction === Direction.UP) {
             this.sprite.spriteFrame = this.sprite_up
         } else if (this.direction === Direction.DOWN) {
@@ -52,7 +50,7 @@ export default class Player extends cc.Component {
         }
     }
 
-    setAnimation() {
+    private setAnimation() {
         if (!this.isMoving) {
             this.isMoving = true
             if (this.direction === Direction.UP) {
@@ -67,13 +65,13 @@ export default class Player extends cc.Component {
         }
     }
 
-    moveStart(direction: Direction) {
+    private moveStart(direction: Direction) {
         Input[direction] = true
         this.setDirection(direction)
         this.setAnimation()
     }
 
-    moveEnd(direction: Direction) {
+    private moveEnd(direction: Direction) {
         Input[direction] = false
         if (Input[Direction.UP]) {
             this.moveStart(Direction.UP)
@@ -164,14 +162,14 @@ export default class Player extends cc.Component {
 
     event_now = null
 
-    eventLister(e: cc.Event.EventKeyboard) {
+    private eventLister(e: cc.Event.EventKeyboard) {
         if (!this.event_now || window['stopAll'] || (window['dialog'] && window['dialog'].active)) return
         if (e.keyCode === cc.macro.KEY.z || e.keyCode === cc.macro.KEY.space) {
             this.event_now()
         }
     }
 
-    onCollisionEnter(other, slef) {
+    onCollisionEnter(other: cc.BoxCollider & { event: { auto: boolean, fn: () => void } }) {
         if (!other.event) return
         if (other.event.auto) {
             this.event_now = null
@@ -181,7 +179,7 @@ export default class Player extends cc.Component {
         }
     }
 
-    onCollisionExit(other, slef) {
+    onCollisionExit() {
         this.event_now = null
     }
 }
