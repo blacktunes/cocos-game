@@ -160,12 +160,21 @@ export default class Player extends cc.Component {
         }
     }
 
+    getPosition() {
+        const position = this.node.getPosition()
+        return {
+            x: Math.round(position.x / 32,),
+            y: Math.round(-position.y / 32),
+            d: this.direction
+        }
+    }
+
     event_now = null
 
     private eventLister(e: cc.Event.EventKeyboard) {
         if (!this.event_now || window['stopAll'] || (window['dialog'] && window['dialog'].active)) return
         if (e.keyCode === cc.macro.KEY.z || e.keyCode === cc.macro.KEY.space) {
-            this.event_now()
+            this.event_now(this)
         }
     }
 

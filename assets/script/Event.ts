@@ -1,5 +1,6 @@
 import Game from './Game'
-import { Direction } from './Player'
+import Player, { Direction } from './Player'
+import User from './data/user'
 
 const { ccclass, property } = cc._decorator
 
@@ -15,7 +16,7 @@ interface MapEvent {
         sprite: string
         event: {
             auto: boolean
-            fn: () => void
+            fn: (player: Player) => void
         }
     }
 }
@@ -43,39 +44,60 @@ export default class GameEvent extends cc.Component {
                         })
                     }
                 }
+            },
+            'save': {
+                x: 4,
+                y: 3,
+                stop: true,
+                sprite: 'test/test',
+                event: {
+                    auto: false,
+                    fn: (player) => {
+                        this.Game.setTalk([
+                            {
+                                id: 2,
+                                text: '我现在是<color=red>存档点</color>'
+                            },
+                            {
+                                id: 1,
+                                text: '哦'
+                            }
+                        ])
+                        const position = player.getPosition()
+                        User.save.location.x = position.x
+                        User.save.location.y = position.y
+                        User.save.location.d = position.d
+                        User.save.location.map = 'map/map2'
+                        cc.sys.localStorage.setItem('save', JSON.stringify(User.save))
+                    }
+                }
             }
         },
         'map/map': {
-            'test': {
+            'save': {
                 x: 10,
                 y: 38,
                 stop: true,
                 sprite: 'test/test',
                 event: {
                     auto: false,
-                    fn: () => {
+                    fn: (player) => {
                         this.Game.setTalk([
                             {
-                                id: 1,
-                                text: '<color=red>这是测试这是测试这是测试这是测试这是测试</color>23424234234 '
-                            },
-                            {
                                 id: 2,
-                                text: '这也是测试这也<color=yellow>是测试这也是测试这</color>也是测试这也是测试这也是测试这也是测试这也是测试这也是测试这也是测试'
-                            },
-                            {
-                                id: 2,
-                                text: '123123123123123144124124124124121414'
+                                text: '我现在是<color=red>存档点</color>'
                             },
                             {
                                 id: 1,
-                                text: 'asdajkdasjdnajslndajsdjasnkjfaskdansjd'
-                            },
-                            {
-                                id: 2,
-                                text: '4123n5j23n5j23n5325n2ij3n5j235test这是测试这是测试这是测试这是测试这是测试'
+                                text: '哦'
                             }
                         ])
+                        const position = player.getPosition()
+                        User.save.location.x = position.x
+                        User.save.location.y = position.y
+                        User.save.location.d = position.d
+                        User.save.location.map = 'map/map'
+                        cc.sys.localStorage.setItem('save', JSON.stringify(User.save))
                     }
                 }
             },

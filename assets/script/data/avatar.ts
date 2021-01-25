@@ -1,4 +1,4 @@
-export const avatar: {
+const avatar: {
   [id: number]: {
     name: string
     path: string
@@ -13,3 +13,5 @@ export const avatar: {
     path: 'avatar/Actor1_6'
   }
 }
+
+export default avatar

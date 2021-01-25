@@ -2,6 +2,7 @@ import Loading from './Loading'
 import Dialog, { TextData } from './Dialog'
 import Player, { Direction } from './Player'
 import GameEvent from './Event'
+import User  from './data/user'
 
 const { ccclass, property } = cc._decorator
 
@@ -42,15 +43,13 @@ export default class Game extends cc.Component {
     }
 
     start() {
-
-        // 测试代码
-        this.setMap('map/map', () => {
-            this.setPlayer(4, 43, 0)
+        this.setMap(User.save.location.map, () => {
+            this.setPlayer(User.save.location.x, User.save.location.y, User.save.location.d)
         }, {
-            fadeInTime: 0,
-            loadingText: ''
+            fadeInTime: 0
         })
 
+        // 测试代码
         cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, (e: cc.Event.EventKeyboard) => {
             if (e.keyCode === 49) {
                 this.setMap('map/map2', () => {
@@ -62,8 +61,25 @@ export default class Game extends cc.Component {
                 })
             }
         })
-        this.setMap('', null, {})
         //
+    }
+
+    private loadSpriteFrame(name: string) {
+        return new Promise<cc.SpriteFrame>((resolve, reject) => {
+            cc.resources.load(name, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
+                if (err) {
+                    console.error(err)
+                    reject()
+                    return
+                }
+                if (!sprite) {
+                    console.warn('资源不存在')
+                    reject()
+                    return
+                }
+                resolve(sprite)
+            })
+        })
     }
 
     /**
@@ -96,7 +112,7 @@ export default class Game extends cc.Component {
             mapNode.removeAllChildren()
         }
 
-        cc.resources.load(path, (err, item: cc.TiledMapAsset) => {
+        cc.resources.load(path, async (err, item: cc.TiledMapAsset) => {
             if (err) {
                 console.error(err)
                 return
@@ -134,28 +150,27 @@ export default class Game extends cc.Component {
             eventNode.removeAllChildren()
             if (this.Event.list[path]) {
                 for (const key in this.Event.list[path]) {
-                    cc.resources.load(this.Event.list[path][key].sprite, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
-                        const node = new cc.Node(key)
-                        node.group = 'item'
-                        node.setPosition(this.Event.list[path][key].x * 32, -this.Event.list[path][key].y * 32)
-                        node.width = node.height = 32
-                        node.setAnchorPoint(0, 0)
-                        if (this.Event.list[path][key].stop) {
-                            const body = node.addComponent(cc.RigidBody)
-                            body.type = cc.RigidBodyType.Static
-                            const collider = node.addComponent(cc.PhysicsBoxCollider)
-                            collider.offset = cc.v2(16, 16)
-                            collider.size = tiledSize
-                            collider.apply()
-                        }
-                        const box = node.addComponent(cc.BoxCollider)
-                        box.size = cc.size(32, 32)
-                        box.offset = cc.v2(16, 16)
-                        box['event'] = this.Event.list[path][key].event
-                        const Sprite = node.addComponent(cc.Sprite)
-                        Sprite.spriteFrame = sprite
-                        eventNode.addChild(node)
-                    })
+                    const sprite = await this.loadSpriteFrame(this.Event.list[path][key].sprite)
+                    const node = new cc.Node(key)
+                    node.group = 'item'
+                    node.setPosition(this.Event.list[path][key].x * 32, -this.Event.list[path][key].y * 32)
+                    node.width = node.height = 32
+                    node.setAnchorPoint(0, 0)
+                    if (this.Event.list[path][key].stop) {
+                        const body = node.addComponent(cc.RigidBody)
+                        body.type = cc.RigidBodyType.Static
+                        const collider = node.addComponent(cc.PhysicsBoxCollider)
+                        collider.offset = cc.v2(16, 16)
+                        collider.size = tiledSize
+                        collider.apply()
+                    }
+                    const box = node.addComponent(cc.BoxCollider)
+                    box.size = cc.size(32, 32)
+                    box.offset = cc.v2(16, 16)
+                    box['event'] = this.Event.list[path][key].event
+                    const Sprite = node.addComponent(cc.Sprite)
+                    Sprite.spriteFrame = sprite
+                    eventNode.addChild(node)
                 }
             }
 

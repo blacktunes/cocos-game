@@ -1,4 +1,4 @@
-import { avatar } from './data'
+import Avatar from './data/avatar'
 
 const { ccclass, property } = cc._decorator
 
@@ -120,9 +120,9 @@ export default class Dialog extends cc.Component {
             this.textEnd = false
         }
 
-        this.nameLabel.string = avatar[textData.id].name
+        this.nameLabel.string = Avatar[textData.id].name
 
-        cc.resources.load(avatar[textData.id].path, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
+        cc.resources.load(Avatar[textData.id].path, cc.SpriteFrame, (err, sprite: cc.SpriteFrame) => {
             this.avatar.spriteFrame = sprite
         })
     }
