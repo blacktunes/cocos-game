@@ -154,8 +154,22 @@ export default class Player extends cc.Component {
             }
             this.node.getComponent(cc.RigidBody).linearVelocity = this.lv
         } else {
-            this.lv.x = 0
-            this.lv.y = 0
+            const x = this.node.position.x / 32
+            const y = -this.node.position.y / 32
+            if (Math.abs(Math.round(x) - x) < 0.05) {
+                this.lv.x = 0
+            } else if (Math.round(x) - x >= 0) {
+                this.lv.x = this.speed / 2
+            } else if (Math.round(x) - x < 0) {
+                this.lv.x = -this.speed / 2
+            }
+            if (Math.abs(Math.round(y) - y) < 0.05) {
+                this.lv.y = 0
+            } else if (Math.round(y) - y >= 0) {
+                this.lv.y = -this.speed / 2
+            } else if (Math.round(y) - y < 0) {
+                this.lv.y = this.speed / 2
+            }
             this.node.getComponent(cc.RigidBody).linearVelocity = this.lv
         }
     }
@@ -163,7 +177,7 @@ export default class Player extends cc.Component {
     getPosition() {
         const position = this.node.getPosition()
         return {
-            x: Math.round(position.x / 32,),
+            x: Math.round(position.x / 32),
             y: Math.round(-position.y / 32),
             d: this.direction
         }
